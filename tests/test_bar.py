@@ -12,27 +12,29 @@ import agate
 import agatetextcharts
 
 class TestBarsChart(unittest.TestCase):
-    def setUp(self):
-        self.rows = (
-            ('first', '17'),
-            ('second', '2'),
-            ('third', '3'),
-            ('fourth', '4'),
-            ('fifth', '40'),
+    def test_all_positive(self):
+        rows = (
+            ('a', '4.2'),
+            ('b', '2.7'),
+            ('c', '10'),
+            ('d', '0'),
+            ('e', '10'),
         )
 
-        self.columns = (
+        columns = (
             ('what', agate.Text()),
             ('how_much', agate.Number()),
+
         )
 
-        self.table = agate.Table(self.rows, self.columns)
+        table = agate.Table(rows, columns)
+        table.bar_chart('what', 'how_much', size=(18, 100))
 
-    def test_single(self):
         output = StringIO.StringIO()
 
-        self.table.bar_chart('what', 'how_much', output=output)
+        table.bar_chart('what', 'how_much', output=output)
 
-        result = output.getvalue().split('\n')
+        with open('tests/compare/test_all_positive.txt') as f:
+            compare = f.read()
 
-        self.assertEqual(len(result), 9)
+        self.assertEqual(compare, output.getstring())
