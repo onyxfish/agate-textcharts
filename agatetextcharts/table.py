@@ -3,6 +3,11 @@
 
 import sys
 
+try:
+    from cDecimal import Decimal
+except ImportError:
+    from decimal import Decimal
+
 import agate
 # from agatecharts.charts import Bars, Columns, Lines, Scatter
 from agatetextcharts.utils import round_limit
@@ -84,18 +89,42 @@ class TableCharts(object):
         # Calculate ticks
         ticks = {}
 
+        # First tick
         if x_min >= 0:
             ticks[-1] = unicode(x_min)
         else:
             ticks[0] = unicode(x_min)
 
+        # Zero tick
         if zero_line:
-            ticks[zero_line] = '0'
+            ticks[zero_line] = u'0'
 
+        # Last tick
         if x_max <= 0:
             ticks[plot_width] = unicode(x_max)
         else:
             ticks[plot_width - 1] = unicode(x_max)
+
+        if x_min >= 0:
+            # Halfway between min and max
+            value = x_max * Decimal('0.5')
+            coord = int((plot_positive_width * (value / x_max)).to_integral_value())
+            ticks[coord] = unicode(value)
+        elif x_max <= 0:
+            # Halfway between min and max
+            value = x_min * Decimal('0.5')
+            coord = int((plot_negative_width * (value / x_min)).to_integral_value())
+            ticks[coord] = unicode(value)
+        else:
+            # Halfway between min and 0
+            value = x_min * Decimal('0.5')
+            coord = int((plot_negative_width * (value / x_min)).to_integral_value())
+            ticks[coord] = unicode(value)
+
+            # Halfway between 0 and max
+            value = x_max * Decimal('0.5')
+            coord = zero_line + int((plot_positive_width * (value / x_max)).to_integral_value())
+            ticks[coord] = unicode(value)
 
         # Chart top
         y_label = label_column_name.rjust(max_label_width)
