@@ -8,13 +8,9 @@ agatetextcharts.patch()
 rows = (
     ('a', '4'),
     ('b', '-2'),
-    ('c', '4'),
+    ('c', '10'),
     ('d', '0'),
-    ('e', '4'),
-    ('f', '4'),
-    ('g', '10'),
-    ('h', '-10'),
-    ('j', '3'),
+    ('e', '-10'),
 )
 
 columns = (
@@ -23,6 +19,39 @@ columns = (
 
 )
 
-table = agate.Table(rows, columns)
+mixed_signs = agate.Table(rows, columns)
+mixed_signs.bar_chart('what', 'how_much', size=(29, 100))
 
-table.bar_chart('what', 'how_much', size=(29, 100))
+rows = (
+    ('a', '-4'),
+    ('b', '-2'),
+    ('c', '-10'),
+    ('d', '0'),
+    ('e', '-10'),
+)
+
+columns = (
+    ('what', agate.Text()),
+    ('how_much', agate.Number()),
+
+)
+
+all_negative = agate.Table(rows, columns)
+all_negative.bar_chart('what', 'how_much', size=(29, 100))
+
+rows = (
+    ('a', '4'),
+    ('b', '2'),
+    ('c', '10'),
+    ('d', '0'),
+    ('e', '10'),
+)
+
+columns = (
+    ('what', agate.Text()),
+    ('how_much', agate.Number()),
+
+)
+
+all_positive = agate.Table(rows, columns)
+all_positive.bar_chart('what', 'how_much', size=(29, 100))

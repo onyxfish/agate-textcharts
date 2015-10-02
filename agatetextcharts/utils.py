@@ -16,33 +16,4 @@ def round_limit(n):
     #     limit -= (10 ** magnitude) / 2
 
     return limit
-
-def round_limits(x_min, x_max, y_min, y_max):
-    """
-    Round off a set of axis limits so they have appropriate margins.
-    """
-    if x_min is not None:
-        if x_min < 0:
-            x_min = round_limit(x_min)
-        else:
-            x_min = 0
-
-    if x_max is not None and x_max != 0:
-        if x_max > 0:
-            x_max = round_limit(x_max)
-        else:
-            x_max = 0
-
-    if y_min is not None:
-        if y_min < 0:
-            y_min = round_limit(x_min)
-        else:
-            y_min = 0
-
-    if y_max is not None:
-        if y_max > 0:
-            y_max = round_limit(y_max)
-        else:
-            y_max = 0
-
-    return (x_min, x_max, y_min, y_max)
+    
