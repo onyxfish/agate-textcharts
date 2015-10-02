@@ -21,7 +21,7 @@ columns = (
 
 print 'Mixed signs'
 mixed_signs = agate.Table(rows, columns)
-mixed_signs.bar_chart('what', 'how_much')
+mixed_signs.bar_chart('what', 'how_much', width=29)
 
 rows = (
     ('a', '-4.2'),
@@ -40,7 +40,7 @@ columns = (
 print ''
 print 'All negative'
 all_negative = agate.Table(rows, columns)
-all_negative.bar_chart('what', 'how_much')
+all_negative.bar_chart('what', 'how_much', width=28)
 
 rows = (
     ('a', '4.2'),
@@ -59,4 +59,4 @@ columns = (
 print ''
 print 'All positive'
 all_positive = agate.Table(rows, columns)
-all_positive.bar_chart('what', 'how_much')
+all_positive.bar_chart('what', 'how_much', width=28)
