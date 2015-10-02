@@ -28,13 +28,64 @@ class TestBarsChart(unittest.TestCase):
         )
 
         table = agate.Table(rows, columns)
-        table.bar_chart('what', 'how_much', size=(18, 100))
 
         output = StringIO.StringIO()
 
-        table.bar_chart('what', 'how_much', output=output)
+        table.bar_chart('what', 'how_much', output=output, size=(18, 100))
 
         with open('tests/compare/test_all_positive.txt') as f:
             compare = f.read()
 
-        self.assertEqual(compare, output.getstring())
+        self.assertEqual(compare, output.getvalue())
+
+    def test_all_negative(self):
+        rows = (
+            ('a', '-4.2'),
+            ('b', '-2.7'),
+            ('c', '-10'),
+            ('d', '0'),
+            ('e', '-10'),
+        )
+
+        columns = (
+            ('what', agate.Text()),
+            ('how_much', agate.Number()),
+
+        )
+
+        table = agate.Table(rows, columns)
+
+        output = StringIO.StringIO()
+
+        table.bar_chart('what', 'how_much', output=output, size=(18, 100))
+
+        with open('tests/compare/test_all_negative.txt') as f:
+            compare = f.read()
+
+        self.assertEqual(compare, output.getvalue())
+
+    def test_mixed_signs(self):
+        rows = (
+            ('a', '4.2'),
+            ('b', '-2.7'),
+            ('c', '10'),
+            ('d', '0'),
+            ('e', '-10'),
+        )
+
+        columns = (
+            ('what', agate.Text()),
+            ('how_much', agate.Number()),
+
+        )
+
+        table = agate.Table(rows, columns)
+
+        output = StringIO.StringIO()
+
+        table.bar_chart('what', 'how_much', output=output, size=(29, 100))
+
+        with open('tests/compare/test_mixed_signs.txt') as f:
+            compare = f.read()
+
+        self.assertEqual(compare, output.getvalue())
