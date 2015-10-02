@@ -12,8 +12,8 @@ def round_limit(n):
     limit = fraction.to_integral_exact(rounding=ROUND_CEILING) * (10 ** magnitude)
 
     # If value fits within a half magnitude, break there
-    if (fraction % 1 < 0.5):
-        limit -= (10 ** magnitude) / 2
+    # if (fraction % 1 < 0.5):
+    #     limit -= (10 ** magnitude) / 2
 
     return limit
 

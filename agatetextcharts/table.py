@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
+import math
 import sys
 
 import agate
@@ -55,8 +56,10 @@ class TableCharts(object):
         plot_width = available_width
 
         # Calculate dimensions
-        x_min = round_limit(value_column.aggregate(agate.Min()))
-        x_max = round_limit(value_column.aggregate(agate.Max()))
+        min_value = value_column.aggregate(agate.Min())
+        x_min = round_limit(min_value)
+        max_value = value_column.aggregate(agate.Max())
+        x_max = round_limit(max_value)
 
         # All positive values
         if x_min >= 0:
@@ -72,9 +75,11 @@ class TableCharts(object):
         else:
             spread = x_max - x_min
             positive_portion = (x_max / spread)
-            zero_line = plot_width - int(plot_width * positive_portion)
-            plot_positive_width = (plot_width - zero_line) - 1  # subtract one for zero line
-            plot_negative_width = plot_width - plot_positive_width
+
+            # subtract one for zero line
+            zero_line = (plot_width - 1) - int(plot_width * positive_portion)
+            plot_positive_width = (plot_width - 1) - zero_line
+            plot_negative_width = (plot_width - 1) - plot_positive_width
 
         # Calculate ticks
         ticks = {}
@@ -84,7 +89,7 @@ class TableCharts(object):
         if zero_line:
             ticks[zero_line] = '0'
 
-        ticks[plot_width] = unicode(x_max)
+        ticks[plot_width - 1] = unicode(x_max)
 
         # Chart top
         y_label = label_column_name.center(max_label_width + 2)
@@ -130,13 +135,15 @@ class TableCharts(object):
             output.write(line + '\n')
 
         # Chart bottom
-        plot_edge = ''
+        plot_edge = '|'
 
         for i in xrange(plot_width):
             if i in ticks:
                 plot_edge += '+'
             else:
                 plot_edge += '-'
+
+        plot_edge += '|'
 
         plot_edge = plot_edge.rjust(size[0])
         output.write(plot_edge + '\n')
@@ -145,7 +152,7 @@ class TableCharts(object):
         tick_text = ' ' * size[0]
 
         for tick, label in ticks.items():
-            pos = (size[0] - plot_width) + tick - (len(label) / 2)
+            pos = (size[0] - plot_width - 1) + tick - (len(label) / 2)
             tick_text = tick_text[:pos] + label + tick_text[pos + len(label):]
 
         output.write(tick_text + '\n')
