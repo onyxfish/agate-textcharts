@@ -45,7 +45,7 @@ all_negative.bar_chart('what', 'how_much', width=28)
 rows = (
     ('a', '4.2'),
     ('b', '2.7'),
-    ('c', '5'),
+    ('c', '0'),
     ('d', '0'),
     ('e', '10'),
 )

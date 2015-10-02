@@ -86,45 +86,41 @@ class TableCharts(object):
             plot_positive_width = (plot_width - 1) - zero_line
             plot_negative_width = (plot_width - 1) - plot_positive_width
 
+        def project(value):
+            if value >= 0:
+                return plot_negative_width + int((plot_positive_width * (value / x_max)).to_integral_value())
+            else:
+                return int((plot_negative_width * (value / x_min)).to_integral_value())
+
         # Calculate ticks
         ticks = {}
 
         # First tick
-        if x_min >= 0:
-            ticks[-1] = unicode(x_min)
-        else:
-            ticks[0] = unicode(x_min)
+        ticks[-1] = unicode(x_min)
 
         # Zero tick
         if zero_line:
             ticks[zero_line] = u'0'
 
         # Last tick
-        if x_max <= 0:
-            ticks[plot_width] = unicode(x_max)
-        else:
-            ticks[plot_width - 1] = unicode(x_max)
+        ticks[plot_width] = unicode(x_max)
 
         if x_min >= 0:
             # Halfway between min and max
             value = x_max * Decimal('0.5')
-            coord = int((plot_positive_width * (value / x_max)).to_integral_value())
-            ticks[coord] = unicode(value)
+            ticks[project(value)] = unicode(value)
         elif x_max <= 0:
             # Halfway between min and max
             value = x_min * Decimal('0.5')
-            coord = int((plot_negative_width * (value / x_min)).to_integral_value())
-            ticks[coord] = unicode(value)
+            ticks[project(value)] = unicode(value)
         else:
             # Halfway between min and 0
             value = x_min * Decimal('0.5')
-            coord = int((plot_negative_width * (value / x_min)).to_integral_value())
-            ticks[coord] = unicode(value)
+            ticks[project(value)] = unicode(value)
 
             # Halfway between 0 and max
             value = x_max * Decimal('0.5')
-            coord = zero_line + int((plot_positive_width * (value / x_max)).to_integral_value())
-            ticks[coord] = unicode(value)
+            ticks[project(value)] = unicode(value)
 
         # Chart top
         y_label = label_column_name.rjust(max_label_width)
@@ -187,10 +183,7 @@ class TableCharts(object):
             output.write(line + '\n')
 
         # Chart bottom
-        if x_min == 0:
-            plot_edge = DEFAULT_TICK_MARKER
-        else:
-            plot_edge = ' '
+        plot_edge = DEFAULT_TICK_MARKER
 
         for i in xrange(plot_width):
             if i in ticks:
@@ -198,10 +191,7 @@ class TableCharts(object):
             else:
                 plot_edge += DEFAULT_HORIZONTAL_SEP
 
-        if x_max == 0:
-            plot_edge += DEFAULT_TICK_MARKER
-        else:
-            plot_edge += ' '
+        plot_edge += DEFAULT_TICK_MARKER
 
         plot_edge = plot_edge.rjust(width)
         output.write(plot_edge + '\n')
