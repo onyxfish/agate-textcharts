@@ -11,10 +11,12 @@ from agatetextcharts.utils import round_limit
 DEFAULT_WIDTH = 120
 
 #: Default character to render for bar units
-DEFAULT_BAR_CHAR = u'X'
+DEFAULT_BAR_CHAR = u'░'
 
-DEFAULT_HORIZONTAL_SEP = '-'
-DEFAULT_VERTICAL_SEP = '|'
+DEFAULT_HORIZONTAL_SEP = u'-'
+DEFAULT_VERTICAL_SEP = u'|'
+DEFAULT_ZERO_SEP = u'▓'
+DEFAULT_TICK_MARKER = u'+'
 
 class TableCharts(object):
     def bar_chart(self, label_column_name, value_column_names, output=sys.stdout, width=DEFAULT_WIDTH):
@@ -48,8 +50,7 @@ class TableCharts(object):
 
         available_width = width
         max_label_width = max(label_column.aggregate(agate.MaxLength()), len(label_column_name))
-        available_width -= max_label_width
-        available_width -= 2    # ': '
+        available_width -= max_label_width + 1
         available_width -= 2    # left and right border
 
         plot_width = available_width
@@ -97,8 +98,8 @@ class TableCharts(object):
             ticks[plot_width - 1] = unicode(x_max)
 
         # Chart top
-        y_label = label_column_name.center(max_label_width + 2)
-        y_label += DEFAULT_HORIZONTAL_SEP * (plot_width + 2)
+        y_label = label_column_name.rjust(max_label_width)
+        y_label += ' ' * (plot_width + 3)
         output.write(y_label + '\n')
 
         # Bars
@@ -119,46 +120,65 @@ class TableCharts(object):
             value_text = unicode(value)
 
             if value >= 0:
-                gap = (' ' * plot_negative_width)
+                gap = (u' ' * plot_negative_width)
 
                 if zero_line:
-                    gap += DEFAULT_VERTICAL_SEP
+                    gap += DEFAULT_ZERO_SEP
 
-                if len(bar) + len(value_text) + 1 < plot_positive_width:
-                    bar += ' %s' % value_text
+                if value != 0:
+                    if len(bar) + len(value_text) + 1 < plot_positive_width:
+                        bar += ' %s' % value_text
             else:
-                gap = ''
+                gap = u''
 
                 if len(bar) + len(value_text) + 1 < plot_negative_width:
-                    gap = (' ' * int(plot_negative_width - bar_width - len(value_text) - 1)) + value_text + ' '
+                    gap = (u' ' * int(plot_negative_width - bar_width - len(value_text) - 1)) + value_text + ' '
                 else:
-                    gap += (' ' * int(plot_negative_width - bar_width))
+                    gap += (u' ' * int(plot_negative_width - bar_width))
 
                 if zero_line:
-                    bar += DEFAULT_VERTICAL_SEP
+                    bar += DEFAULT_ZERO_SEP
 
             bar_text = (gap + bar).ljust(plot_width)
 
-            line = '%s: |%s|' % (label_text, bar_text)
+            line = '%s ' % label_text
+
+            if x_min == 0:
+                line += DEFAULT_ZERO_SEP
+            else:
+                line += ' '
+
+            line += bar_text
+
+            if x_max == 0:
+                line += DEFAULT_ZERO_SEP
+            else:
+                line += ' '
 
             output.write(line + '\n')
 
         # Chart bottom
-        plot_edge = DEFAULT_VERTICAL_SEP
+        if x_min == 0:
+            plot_edge = DEFAULT_TICK_MARKER
+        else:
+            plot_edge = ' '
 
         for i in xrange(plot_width):
             if i in ticks:
-                plot_edge += '+'
+                plot_edge += DEFAULT_TICK_MARKER
             else:
                 plot_edge += DEFAULT_HORIZONTAL_SEP
 
-        plot_edge += DEFAULT_VERTICAL_SEP
+        if x_max == 0:
+            plot_edge += DEFAULT_TICK_MARKER
+        else:
+            plot_edge += ' '
 
         plot_edge = plot_edge.rjust(width)
         output.write(plot_edge + '\n')
 
         # Ticks
-        tick_text = ' ' * width
+        tick_text = u' ' * width
 
         for tick, label in ticks.items():
             pos = (width - plot_width - 1) + tick - (len(label) / 2)
