@@ -84,12 +84,18 @@ class TableCharts(object):
         # Calculate ticks
         ticks = {}
 
-        ticks[0] = unicode(x_min)
+        if x_min >= 0:
+            ticks[-1] = unicode(x_min)
+        else:
+            ticks[0] = unicode(x_min)
 
         if zero_line:
             ticks[zero_line] = '0'
 
-        ticks[plot_width - 1] = unicode(x_max)
+        if x_max <= 0:
+            ticks[plot_width] = unicode(x_max)
+        else:
+            ticks[plot_width - 1] = unicode(x_max)
 
         # Chart top
         y_label = label_column_name.center(max_label_width + 2)
@@ -103,27 +109,31 @@ class TableCharts(object):
             if value == 0:
                 bar_width = 0
             elif value > 0:
-                bar_width = int(plot_positive_width * (value / x_max))
+                bar_width = int((plot_positive_width * (value / x_max)).to_integral_value())
             elif value < 0:
-                bar_width = int(plot_negative_width * (value / x_min))
+                bar_width = int((plot_negative_width * (value / x_min)).to_integral_value())
 
             label_text = label.rjust(max_label_width)
 
             bar = DEFAULT_BAR_CHAR * bar_width
 
-            # value_text = unicode(value)
-            #
-            # if bar_width + len(value_text) + 1 < plot_width:
-            #     bar += ' %s' % value_text
-
+            value_text = unicode(value)
 
             if value >= 0:
                 gap = (' ' * plot_negative_width)
 
                 if zero_line:
                     gap += '|'
+
+                if len(bar) + len(value_text) + 1 < plot_positive_width:
+                    bar += ' %s' % value_text
             else:
-                gap = (' ' * int(plot_negative_width - bar_width))
+                gap = ''
+
+                if len(bar) + len(value_text) + 1 < plot_negative_width:
+                    gap = (' ' * int(plot_negative_width - bar_width - len(value_text) - 1)) + value_text + ' '
+                else:
+                    gap += (' ' * int(plot_negative_width - bar_width))
 
                 if zero_line:
                     bar += '|'

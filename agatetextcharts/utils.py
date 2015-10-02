@@ -6,6 +6,9 @@ def round_limit(n):
     """
     Round a axis minimum or maximum to a suitable break point.
     """
+    if n == 0:
+        return n
+
     magnitude = n.copy_abs().log10().to_integral_exact(rounding=ROUND_FLOOR)
     fraction = (n / (10 ** magnitude))
 
@@ -16,4 +19,3 @@ def round_limit(n):
     #     limit -= (10 ** magnitude) / 2
 
     return limit
-    
