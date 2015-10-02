@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import csv
 import cStringIO as StringIO
 
 try:
@@ -31,7 +30,7 @@ class TestBarsChart(unittest.TestCase):
 
         output = StringIO.StringIO()
 
-        table.bar_chart('what', 'how_much', output=output, size=(18, 100))
+        table.bar_chart('what', 'how_much', output=output, width=18)
 
         with open('tests/compare/test_all_positive.txt') as f:
             compare = f.read()
@@ -57,7 +56,7 @@ class TestBarsChart(unittest.TestCase):
 
         output = StringIO.StringIO()
 
-        table.bar_chart('what', 'how_much', output=output, size=(18, 100))
+        table.bar_chart('what', 'how_much', output=output, width=18)
 
         with open('tests/compare/test_all_negative.txt') as f:
             compare = f.read()
@@ -83,7 +82,7 @@ class TestBarsChart(unittest.TestCase):
 
         output = StringIO.StringIO()
 
-        table.bar_chart('what', 'how_much', output=output, size=(29, 100))
+        table.bar_chart('what', 'how_much', output=output, width=29)
 
         with open('tests/compare/test_mixed_signs.txt') as f:
             compare = f.read()

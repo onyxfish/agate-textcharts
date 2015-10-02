@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-import math
 import sys
 
 import agate
 # from agatecharts.charts import Bars, Columns, Lines, Scatter
 from agatetextcharts.utils import round_limit
 
-#: Default rendered chart size in characters
-DEFAULT_SIZE = (120, 120)
+#: Default chart width in characters
+DEFAULT_WIDTH = 120
 
 #: Default character to render for bar units
 DEFAULT_BAR_CHAR = u'X'
@@ -18,7 +17,7 @@ DEFAULT_HORIZONTAL_SEP = '-'
 DEFAULT_VERTICAL_SEP = '|'
 
 class TableCharts(object):
-    def bar_chart(self, label_column_name, value_column_names, output=sys.stdout, size=DEFAULT_SIZE):
+    def bar_chart(self, label_column_name, value_column_names, output=sys.stdout, width=DEFAULT_WIDTH):
         """
         Plots a bar chart.
 
@@ -47,7 +46,7 @@ class TableCharts(object):
         if not isinstance(value_column.data_type, agate.Number):
             raise ValueError('Only Number data is supported for bar chart values.')
 
-        available_width = size[0]
+        available_width = width
         max_label_width = max(label_column.aggregate(agate.MaxLength()), len(label_column_name))
         available_width -= max_label_width
         available_width -= 2    # ': '
@@ -99,7 +98,7 @@ class TableCharts(object):
 
         # Chart top
         y_label = label_column_name.center(max_label_width + 2)
-        y_label += '-' * (plot_width + 2)
+        y_label += DEFAULT_HORIZONTAL_SEP * (plot_width + 2)
         output.write(y_label + '\n')
 
         # Bars
@@ -123,7 +122,7 @@ class TableCharts(object):
                 gap = (' ' * plot_negative_width)
 
                 if zero_line:
-                    gap += '|'
+                    gap += DEFAULT_VERTICAL_SEP
 
                 if len(bar) + len(value_text) + 1 < plot_positive_width:
                     bar += ' %s' % value_text
@@ -136,7 +135,7 @@ class TableCharts(object):
                     gap += (' ' * int(plot_negative_width - bar_width))
 
                 if zero_line:
-                    bar += '|'
+                    bar += DEFAULT_VERTICAL_SEP
 
             bar_text = (gap + bar).ljust(plot_width)
 
@@ -145,28 +144,28 @@ class TableCharts(object):
             output.write(line + '\n')
 
         # Chart bottom
-        plot_edge = '|'
+        plot_edge = DEFAULT_VERTICAL_SEP
 
         for i in xrange(plot_width):
             if i in ticks:
                 plot_edge += '+'
             else:
-                plot_edge += '-'
+                plot_edge += DEFAULT_HORIZONTAL_SEP
 
-        plot_edge += '|'
+        plot_edge += DEFAULT_VERTICAL_SEP
 
-        plot_edge = plot_edge.rjust(size[0])
+        plot_edge = plot_edge.rjust(width)
         output.write(plot_edge + '\n')
 
         # Ticks
-        tick_text = ' ' * size[0]
+        tick_text = ' ' * width
 
         for tick, label in ticks.items():
-            pos = (size[0] - plot_width - 1) + tick - (len(label) / 2)
+            pos = (width - plot_width - 1) + tick - (len(label) / 2)
             tick_text = tick_text[:pos] + label + tick_text[pos + len(label):]
 
         output.write(tick_text + '\n')
 
         # X-axis label
-        x_label = value_column_names[0].center(plot_width + 2).rjust(size[0])
+        x_label = value_column_names[0].center(plot_width + 2).rjust(width)
         output.write(x_label + '\n')
