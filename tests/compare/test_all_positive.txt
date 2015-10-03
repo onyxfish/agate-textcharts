@@ -1,9 +1,0 @@
- what ------------
-   a: |XXXX 4.2  |
-   b: |XXX 2.7   |
-   c: |XXXXXXXXXX|
-   d: | 0        |
-   e: |XXXXXXXXXX|
-      |---------+|
-      0        10 
-        how_much  

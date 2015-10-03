@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import cStringIO as StringIO
+import codecs
+import StringIO
 
 try:
     import unittest2 as unittest
@@ -32,7 +33,7 @@ class TestBarsChart(unittest.TestCase):
 
         table.bar_chart('what', 'how_much', output=output, width=18)
 
-        with open('tests/compare/test_all_positive.txt') as f:
+        with codecs.open('tests/compare/bar_all_positive.txt', encoding='utf-8') as f:
             compare = f.read()
 
         self.assertEqual(compare, output.getvalue())
@@ -58,7 +59,7 @@ class TestBarsChart(unittest.TestCase):
 
         table.bar_chart('what', 'how_much', output=output, width=18)
 
-        with open('tests/compare/test_all_negative.txt') as f:
+        with codecs.open('tests/compare/bar_all_negative.txt', encoding='utf-8') as f:
             compare = f.read()
 
         self.assertEqual(compare, output.getvalue())
@@ -84,7 +85,7 @@ class TestBarsChart(unittest.TestCase):
 
         table.bar_chart('what', 'how_much', output=output, width=29)
 
-        with open('tests/compare/test_mixed_signs.txt') as f:
+        with codecs.open('tests/compare/bar_mixed_signs.txt', encoding='utf-8') as f:
             compare = f.read()
 
         self.assertEqual(compare, output.getvalue())
