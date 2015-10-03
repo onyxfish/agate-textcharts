@@ -13,10 +13,9 @@ from agatetextcharts.utils import round_limit
 #: Default character to render for bar units
 DEFAULT_BAR_CHAR = u'░'
 
-DEFAULT_HORIZONTAL_SEP = u'-'
-DEFAULT_VERTICAL_SEP = u'|'
+DEFAULT_HORIZONTAL_SEP = u'─'
 DEFAULT_ZERO_SEP = u'▓'
-DEFAULT_TICK_MARKER = u'+'
+DEFAULT_TICK_MARKER = u'┼'
 
 ALL_POSITIVE = 0
 ALL_NEGATIVE = 1
