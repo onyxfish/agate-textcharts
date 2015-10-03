@@ -93,6 +93,8 @@ class Bars(Chart):
 
     def project(self, value):
         if value >= 0:
+            print value / self.x_max
+            print self.plot_positive_width * (value / self.x_max)
             return self.plot_negative_width + int((self.plot_positive_width * (value / self.x_max)).to_integral_value())
         else:
             return int((self.plot_negative_width * (value / self.x_min)).to_integral_value())
@@ -127,6 +129,8 @@ class Bars(Chart):
             # Halfway between 0 and max
             value = self.x_max * Decimal('0.5')
             self.ticks[self.project(value)] = unicode(value)
+
+        print self.ticks
 
     def plot(self):
         # Chart top
