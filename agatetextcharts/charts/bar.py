@@ -2,9 +2,9 @@
 # -*- coding: utf8 -*-
 
 try:
-    from cDecimal import Decimal
+    from cDecimal import Decimal, ROUND_FLOOR, ROUND_CEILING
 except ImportError:
-    from decimal import Decimal
+    from decimal import Decimal, ROUND_FLOOR, ROUND_CEILING
 
 import agate
 from agatetextcharts.charts.base import Chart
@@ -17,6 +17,10 @@ DEFAULT_HORIZONTAL_SEP = u'-'
 DEFAULT_VERTICAL_SEP = u'|'
 DEFAULT_ZERO_SEP = u'▓'
 DEFAULT_TICK_MARKER = u'+'
+
+ALL_POSITIVE = 0
+ALL_NEGATIVE = 1
+MIXED_SIGNS = 2
 
 class Bars(Chart):
     """
@@ -61,7 +65,6 @@ class Bars(Chart):
         available_width = self.width
         self.max_label_width = max(self.label_column.aggregate(agate.MaxLength()), len(self.y_label))
         available_width -= self.max_label_width + 1
-        available_width -= 2    # left and right border
 
         self.plot_width = available_width
 
@@ -71,53 +74,55 @@ class Bars(Chart):
         max_value = self.value_column.aggregate(agate.Max())
         self.x_max = round_limit(max_value)
 
-        self.zero_line = None
-        self.plot_positive_width = 0
-        self.plot_negative_width = 0
-
-        # All positive values
         if self.x_min >= 0:
-            self.plot_positive_width = self.plot_width
-        # All negative values
+            self.signs = ALL_POSITIVE
         elif self.x_max <= 0:
-            self.plot_negative_width = self.plot_width
-        # Mixed positive and negative values
+            self.signs = ALL_NEGATIVE
+        else:
+            self.signs = MIXED_SIGNS
+
+        if self.signs == ALL_POSITIVE:
+            self.plot_negative_width = 0
+            self.zero_line = 0
+            self.plot_positive_width = self.plot_width - 1
+        elif self.signs == ALL_NEGATIVE:
+            self.plot_negative_width = self.plot_width - 1
+            self.zero_line = self.plot_width - 1
+            self.plot_positive_width = 0
         else:
             spread = self.x_max - self.x_min
-            positive_portion = (self.x_max / spread)
+            negative_portion = (self.x_min.copy_abs() / spread)
 
-            # subtract one for zero line
-            self.zero_line = (self.plot_width - 1) - int(self.plot_width * positive_portion)
-            self.plot_positive_width = (self.plot_width - 1) - self.zero_line
-            self.plot_negative_width = (self.plot_width - 1) - self.plot_positive_width
+            # Subtract one for zero line
+            self.plot_negative_width = int(((self.plot_width - 1) * negative_portion).to_integral_value())
+            self.zero_line = self.plot_negative_width
+            self.plot_positive_width = self.plot_width - (self.plot_negative_width + 1)
 
     def project(self, value):
         if value >= 0:
-            print value / self.x_max
-            print self.plot_positive_width * (value / self.x_max)
             return self.plot_negative_width + int((self.plot_positive_width * (value / self.x_max)).to_integral_value())
         else:
-            return int((self.plot_negative_width * (value / self.x_min)).to_integral_value())
+            return self.plot_negative_width - int((self.plot_negative_width * (value / self.x_min)).to_integral_value())
 
     def calculate_ticks(self):
         # Calculate ticks
         self.ticks = {}
 
         # First tick
-        self.ticks[-1] = unicode(self.x_min)
+        self.ticks[0] = unicode(self.x_min)
 
         # Zero tick
-        if self.zero_line:
+        if self.signs == MIXED_SIGNS:
             self.ticks[self.zero_line] = u'0'
 
         # Last tick
-        self.ticks[self.plot_width] = unicode(self.x_max)
+        self.ticks[self.plot_width - 1] = unicode(self.x_max)
 
-        if self.x_min >= 0:
+        if self.signs == ALL_POSITIVE:
             # Halfway between min and max
             value = self.x_max * Decimal('0.5')
             self.ticks[self.project(value)] = unicode(value)
-        elif self.x_max <= 0:
+        elif self.signs == ALL_NEGATIVE:
             # Halfway between min and max
             value = self.x_min * Decimal('0.5')
             self.ticks[self.project(value)] = unicode(value)
@@ -130,12 +135,10 @@ class Bars(Chart):
             value = self.x_max * Decimal('0.5')
             self.ticks[self.project(value)] = unicode(value)
 
-        print self.ticks
-
     def plot(self):
         # Chart top
         top_line = self.y_label.rjust(self.max_label_width)
-        top_line += ' ' * (self.plot_width + 3)
+        top_line += ' ' * (self.plot_width + 1)
         self.write(top_line)
 
         # Bars
@@ -145,9 +148,9 @@ class Bars(Chart):
             if value == 0:
                 bar_width = 0
             elif value > 0:
-                bar_width = int((self.plot_positive_width * (value / self.x_max)).to_integral_value())
+                bar_width = self.project(value) - self.plot_negative_width
             elif value < 0:
-                bar_width = int((self.plot_negative_width * (value / self.x_min)).to_integral_value())
+                bar_width = self.plot_negative_width - self.project(value)
 
             label_text = label.rjust(self.max_label_width)
             bar = DEFAULT_BAR_CHAR * bar_width
@@ -156,7 +159,9 @@ class Bars(Chart):
             if value >= 0:
                 gap = (u' ' * self.plot_negative_width)
 
-                if self.zero_line:
+                if self.signs == ALL_POSITIVE:
+                    gap = DEFAULT_ZERO_SEP + gap
+                else:
                     gap += DEFAULT_ZERO_SEP
 
                 if value != 0:
@@ -170,37 +175,24 @@ class Bars(Chart):
                 else:
                     gap += (u' ' * int(self.plot_negative_width - bar_width))
 
-                if self.zero_line:
+                if self.signs == ALL_NEGATIVE or self.signs == MIXED_SIGNS:
                     bar += DEFAULT_ZERO_SEP
 
             bar_text = (gap + bar).ljust(self.plot_width)
 
             line = '%s ' % label_text
-
-            if self.x_min == 0:
-                line += DEFAULT_ZERO_SEP
-            else:
-                line += ' '
-
             line += bar_text
-
-            if self.x_max == 0:
-                line += DEFAULT_ZERO_SEP
-            else:
-                line += ' '
 
             self.write(line)
 
         # Chart bottom
-        plot_edge = DEFAULT_TICK_MARKER
+        plot_edge = ''
 
         for i in xrange(self.plot_width):
             if i in self.ticks:
                 plot_edge += DEFAULT_TICK_MARKER
             else:
                 plot_edge += DEFAULT_HORIZONTAL_SEP
-
-        plot_edge += DEFAULT_TICK_MARKER
 
         plot_edge = plot_edge.rjust(self.width)
         self.write(plot_edge)
