@@ -138,7 +138,6 @@ class Bars(Chart):
     def plot(self):
         # Chart top
         top_line = self.y_label.rjust(self.max_label_width)
-        top_line += ' ' * (self.plot_width + 1)
         self.write(top_line)
 
         # Bars

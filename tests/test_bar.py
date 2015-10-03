@@ -16,7 +16,7 @@ class TestBarsChart(unittest.TestCase):
         rows = (
             ('a', '4.2'),
             ('b', '2.7'),
-            ('c', '10'),
+            ('c', '5'),
             ('d', '0'),
             ('e', '10'),
         )
@@ -31,7 +31,7 @@ class TestBarsChart(unittest.TestCase):
 
         output = StringIO.StringIO()
 
-        table.bar_chart('what', 'how_much', output=output, width=18)
+        table.bar_chart('what', 'how_much', output=output, width=16)
 
         with codecs.open('tests/compare/bar_all_positive.txt', encoding='utf-8') as f:
             compare = f.read()
@@ -42,7 +42,7 @@ class TestBarsChart(unittest.TestCase):
         rows = (
             ('a', '-4.2'),
             ('b', '-2.7'),
-            ('c', '-10'),
+            ('c', '-5'),
             ('d', '0'),
             ('e', '-10'),
         )
@@ -57,7 +57,7 @@ class TestBarsChart(unittest.TestCase):
 
         output = StringIO.StringIO()
 
-        table.bar_chart('what', 'how_much', output=output, width=18)
+        table.bar_chart('what', 'how_much', output=output, width=16)
 
         with codecs.open('tests/compare/bar_all_negative.txt', encoding='utf-8') as f:
             compare = f.read()
@@ -68,7 +68,7 @@ class TestBarsChart(unittest.TestCase):
         rows = (
             ('a', '4.2'),
             ('b', '-2.7'),
-            ('c', '10'),
+            ('c', '5'),
             ('d', '0'),
             ('e', '-10'),
         )
@@ -83,7 +83,7 @@ class TestBarsChart(unittest.TestCase):
 
         output = StringIO.StringIO()
 
-        table.bar_chart('what', 'how_much', output=output, width=29)
+        table.bar_chart('what', 'how_much', output=output, width=36)
 
         with codecs.open('tests/compare/bar_mixed_signs.txt', encoding='utf-8') as f:
             compare = f.read()
