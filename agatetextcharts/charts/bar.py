@@ -201,11 +201,11 @@ class Bars(Chart):
         tick_text = u' ' * self.width
 
         for tick, label in self.ticks.items():
-            pos = (self.width - self.plot_width - 1) + tick - (len(label) / 2)
+            pos = (self.width - self.plot_width) + tick - (len(label) / 2)
             tick_text = tick_text[:pos] + label + tick_text[pos + len(label):]
 
         self.write(tick_text)
 
         # X-axis label
-        x_label = self.x_label.center(self.plot_width + 2).rjust(self.width)
+        x_label = self.x_label.center(self.plot_width + 1).rjust(self.width)
         self.write(x_label)

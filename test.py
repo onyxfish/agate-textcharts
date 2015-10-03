@@ -40,7 +40,7 @@ columns = (
 print ''
 print 'All negative'
 all_negative = agate.Table(rows, columns)
-all_negative.bar_chart('what', 'how_much', width=26)
+all_negative.bar_chart('what', 'how_much', width=16)
 
 rows = (
     ('a', '4.2'),
@@ -59,4 +59,4 @@ columns = (
 print ''
 print 'All positive'
 all_positive = agate.Table(rows, columns)
-all_positive.bar_chart('what', 'how_much', width=26)
+all_positive.bar_chart('what', 'how_much', width=16)
